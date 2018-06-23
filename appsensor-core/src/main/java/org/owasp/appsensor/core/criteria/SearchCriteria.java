@@ -2,19 +2,25 @@ package org.owasp.appsensor.core.criteria;
 
 import java.util.Collection;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.owasp.appsensor.core.DetectionPoint;
 import org.owasp.appsensor.core.User;
+import org.owasp.appsensor.core.rule.Rule;
+import org.owasp.appsensor.core.util.DateUtils;
 
 public class SearchCriteria {
-	
+
 	private User user;
-	
+
+	private Rule rule;
+
 	private DetectionPoint detectionPoint;
-	
+
 	private Collection<String> detectionSystemIds;
-	
+
 	private String earliest;
-	
+
 	public User getUser() {
 		return user;
 	}
@@ -51,7 +57,30 @@ public class SearchCriteria {
 
 	public SearchCriteria setEarliest(String earliest) {
 		this.earliest = earliest;
-		
+
+		return this;
+	}
+
+	public Rule getRule() {
+		return this.rule;
+	}
+
+	public SearchCriteria setRule(Rule rule) {
+		this.rule = rule;
+		return setEarliest(earliest, true);
+	}
+
+	public SearchCriteria setEarliest(String earliest, boolean inclusive) {
+		if(inclusive) {
+			this.earliest = earliest;
+		} else {
+			DateTime time = DateUtils.fromString(earliest);
+
+			this.earliest = time
+					.plus(Duration.standardSeconds(1))	// add one second if exclusive
+					.toString();
+		}
+
 		return this;
 	}
 

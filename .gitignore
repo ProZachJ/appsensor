@@ -3,6 +3,7 @@
 .gradle
 bin/**
 target/**
+**/target/**
 tmp/**
 tmp/**/*
 *.tmp
@@ -14,6 +15,9 @@ local.properties
 .loadpath
 .classpath
 .project
+*.iml
+*.ipr
+*.iws
 
 # External tool builders
 .externalToolBuilders/
