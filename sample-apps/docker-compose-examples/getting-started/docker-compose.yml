@@ -11,7 +11,7 @@ services:
     volumes:
       - ./data:/docker-entrypoint-initdb.d
   appsensor-ui: 
-    build: ../../../appsensor-ui/
+    image: prozachj/appsensor-ui
     container_name: appsensor-ui
     environment: 
       - APPSENSOR_REST_REPORTING_ENGINE_URL=http://rest-server:8085
@@ -28,11 +28,11 @@ services:
     links:
       - db
       - rest-server
-    entrypoint: dockerize -wait tcp://db:3306 -timeout 30s java -Djava.security.egd=file:/dev/./urandom -jar app.jar
+    entrypoint: java -Djava.security.egd=file:/dev/./urandom -jar /app.jar
 #    depends_on:
 #      - "rest-server"
   rest-server:
-    build: ../../appsensor-ws-rest-server-with-websocket-boot/
+    image: prozachj/appsensor-ws-rest-server-with-websocket-boot-rules
     container_name: rest-server
     environment:
       - APPSENSOR_WEB_SOCKET_HOST_URL=ws://rest-server:8085/dashboard
