@@ -1,21 +1,17 @@
-FROM anapsix/alpine-java
+FROM prozachj/appsensor-build
 
-VOLUME /tmp
-ADD target/appsensor-ui-2.3.2.jar app.jar
-
-ENV DOCKERIZE_VERSION="0.2.0"
-ENV DOCKERIZE_URL="https://github.com/jwilder/dockerize/releases/download/v$DOCKERIZE_VERSION"
-ENV DOCKERIZE_PKG="dockerize-linux-amd64-v$DOCKERIZE_VERSION.tar.gz"
-
-RUN     apk update \                                                                                                                                                                                                                        
-   &&   apk add ca-certificates wget \                                                                                                                                                                                                      
-   &&   update-ca-certificates   
-    
-RUN wget -q $DOCKERIZE_URL/$DOCKERIZE_PKG -O $DOCKERIZE_PKG
-RUN tar -C /usr/local/bin -xzvf $DOCKERIZE_PKG 
-   
-#ADD wait-for-it.sh wait-for-it.sh
-#RUN chmod +x wait-for-it.sh
-RUN bash -c 'touch /app.jar'
+COPY . appsensor-ui
+WORKDIR appsensor-ui
+RUN mvn package
+RUN mv target/appsensor-ui-2.3.3.jar /app.jar
+RUN cd ../ && rm -rf appsensor-ui
 ENV APPSENSOR_WEB_SOCKET_HOST_URL=ws://localhost:8085/dashboard
+ENV APPSENSOR_REST_REPORTING_ENGINE_URL=http://localhost:8085
+ENV APPSENSOR_CLIENT_APPLICATION_ID_HEADER_NAME=X-Appsensor-Client-Application-Name2
+ENV APPSENSOR_CLIENT_APPLICATION_ID_HEADER_VALUE=myclientapp
+ENV APPSENSOR_WEB_SOCKET_HOST_URL=ws://localhost:8085/dashboard
+ENV spring.datasource.url=jdbc:mysql://localhost/appsensor
+ENV spring.datasource.username=appsensor_user
+ENV spring.datasource.password=appsensor_pass
+
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
