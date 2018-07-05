@@ -1,0 +1,104 @@
+{
+    "containerDefinitions": [
+        {
+            "entryPoint": [
+                "java",
+                "-Djava.security.egd=file:/dev/./urandom",
+                "-jar",
+                "/app.jar"
+            ],
+            "environment": [
+                {
+                    "name": "APPSENSOR_REST_REPORTING_ENGINE_URL",
+                    "value": "http://rest-server:8085"
+                },
+                {
+                    "name": "APPSENSOR_CLIENT_APPLICATION_ID_HEADER_NAME",
+                    "value": "X-Appsensor-Client-Application-Name2"
+                },
+                {
+                    "name": "APPSENSOR_CLIENT_APPLICATION_ID_HEADER_VALUE",
+                    "value": "myclientapp"
+                },
+                {
+                    "name": "APPSENSOR_WEB_SOCKET_HOST_URL",
+                    "value": "ws://rest-server:8085/dashboard"
+                },
+                {
+                    "name": "spring.datasource.url",
+                    "value": "jdbc:mysql://db/appsensor"
+                },
+                {
+                    "name": "spring.datasource.username",
+                    "value": "root"
+                },
+                {
+                    "name": "spring.datasource.password",
+                    "value": "pass"
+                }
+            ],
+            "essential": true,
+            "image": "prozachj/appsensor-ui",
+            "links": [
+                "db",
+                "rest-server"
+            ],
+            "name": "appsensor-ui",
+            "portMappings": [
+                {
+                    "containerPort": 8084,
+                    "hostPort": 8084
+                }
+            ]
+        },
+        {
+            "environment": [
+                {
+                    "name": "MYSQL_ROOT_PASSWORD",
+                    "value": "pass"
+                }
+            ],
+            "essential": true,
+            "image": "mysql:5",
+            "mountPoints": [
+                {
+                    "containerPath": "/docker-entrypoint-initdb.d",
+                    "sourceVolume": "_Data"
+                }
+            ],
+            "name": "db",
+            "portMappings": [
+                {
+                    "containerPort": 3306,
+                    "hostPort": 3306
+                }
+            ]
+        },
+        {
+            "environment": [
+                {
+                    "name": "APPSENSOR_WEB_SOCKET_HOST_URL",
+                    "value": "ws://rest-server:8085/dashboard"
+                }
+            ],
+            "essential": true,
+            "image": "prozachj/appsensor-ws-rest-server-with-websocket-boot-rules",
+            "name": "rest-server",
+            "portMappings": [
+                {
+                    "containerPort": 8085,
+                    "hostPort": 8085
+                }
+            ]
+        }
+    ],
+    "family": "",
+    "volumes": [
+        {
+            "host": {
+                "sourcePath": "./data"
+            },
+            "name": "_Data"
+        }
+    ]
+}
